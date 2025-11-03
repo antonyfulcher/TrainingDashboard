@@ -13,7 +13,7 @@
     Visualization & Content Choices:
     - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking with RAG likelihood -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) with RAG colors -> Interaction: Filter buttons (All, JJ, B, S&C, Rec) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
     - Report Info: Other Possible Sessions (grid) -> Goal: Inform coach of potential extra sessions visually -> Viz/Presentation: Secondary 7-Column Calendar Grid (HTML/Tailwind) with RED status -> Interaction: Inherits filter functionality from main schedule. -> Justification: Clearly separates core schedule from optional sessions while maintaining visual consistency.
-    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations, Partner Schedule, WFH) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
+    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations, Partner Schedule, WFH, Program Strategy) -> Goal: Present core health context and strategic intent -> Viz/Presentation: Seven static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
     - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Single Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance across modalities.
     - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
     - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
@@ -324,6 +324,31 @@
                         <p class="text-sm text-red-700"><span class="font-bold">Alcohol:</span> Frequent intake significantly impacts recovery/sleep.</p>
                         <p class="text-sm text-yellow-800"><span class="font-bold">Renovations:</span> Consistent high-effort activity during weekends/evenings (impacts recovery and evening training).</p>
                         <p class="text-sm text-blue-700"><span class="font-bold">Partner Schedule:</span> Variable days off require plan shuffling/flexibility for recovery and social time.</p>
+                    </div>
+                </div>
+                <!-- NEW Program Strategy & Vulnerabilities Card -->
+                <div class="lg:col-span-full bg-white p-6 rounded-lg shadow-xl border border-gray-300">
+                    <h3 class="text-xl font-bold mb-3 text-orange-600 flex items-center">
+                        <span class="mr-2">&#9881;</span> Program Strategy & Vulnerabilities
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <h4 class="font-semibold text-lg text-gray-800 mb-1">12-Week Strategic Goal</h4>
+                            <p class="text-sm text-gray-700">Achieve **88 kg target** by March 26, 2026, while **maintaining and developing Jiujitsu strength** for the match.</p>
+                        </div>
+                        <div class="border-l-4 border-red-500 pl-4">
+                            <h4 class="font-semibold text-lg text-gray-800 mb-1">Physical Vulnerabilities</h4>
+                            <ul class="text-sm text-gray-700 list-disc list-inside space-y-1">
+                                <li>**Lower Back:** Prone to issues after deadlifting (requires diligent form/recovery).</li>
+                                <li>**Shoulders:** Weakest recovery point overall (needs dedicated mobility/prehab).</li>
+                                <li>**Neck:** Jiujitsu risk factor (recovery is paramount).</li>
+                                <li>**Hips:** Biggest mobility issue (requires programmed mobility work).</li>
+                            </ul>
+                        </div>
+                        <div class="border-l-4 border-yellow-500 pl-4">
+                            <h4 class="font-semibold text-lg text-gray-800 mb-1">Primary Recovery Threat</h4>
+                            <p class="text-sm text-gray-700">**High Alcohol Intake (up to 20+ pints/week).** This frequently compromises sleep, recovery capacity, and forces session rescheduling to limit injury risk. Mitigation through mandatory Recovery Sessions (sauna/plunge) is essential.</p>
+                        </div>
                     </div>
                 </div>
             </div>
