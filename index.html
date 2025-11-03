@@ -13,7 +13,7 @@
     Visualization & Content Choices:
     - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking with RAG likelihood -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) with RAG colors -> Interaction: Filter buttons (All, JJ, B, S&C, Rec) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
     - Report Info: Other Possible Sessions (grid) -> Goal: Inform coach of potential extra sessions visually -> Viz/Presentation: Secondary 7-Column Calendar Grid (HTML/Tailwind) with RED status -> Interaction: Inherits filter functionality from main schedule. -> Justification: Clearly separates core schedule from optional sessions while maintaining visual consistency.
-    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations, Partner Schedule) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
+    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations, Partner Schedule, WFH) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
     - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Single Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance across modalities.
     - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
     - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
@@ -319,6 +319,7 @@
                         <span class="mr-2">&#9918;</span> Other Lifestyle Factors
                     </h3>
                     <div class="space-y-2">
+                        <p class="text-sm text-gray-700"><span class="font-bold">Work:</span> Works from home (High flexibility/Low travel fatigue).</p>
                         <p class="text-sm text-gray-700"><span class="font-bold">Hobby:</span> Golf (Social, Low intensity)</p>
                         <p class="text-sm text-red-700"><span class="font-bold">Alcohol:</span> Frequent intake significantly impacts recovery/sleep.</p>
                         <p class="text-sm text-yellow-800"><span class="font-bold">Renovations:</span> Consistent high-effort activity during weekends/evenings (impacts recovery and evening training).</p>
