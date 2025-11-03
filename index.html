@@ -9,11 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- 
     Chosen Palette: Calm Focus (Warm Neutrals)
-    Application Structure Plan: A single-page dashboard structure is used, split into three logical sections: "Typical Weekly Schedule", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen over a direct report mirror to immediately present the most actionable information (the weekly plan) in a visual, interactive format (a calendar grid). The "Analysis" section follows, providing synthesis of the plan (via charts), which is more user-friendly than forcing the user to do the math. The "Constraints" section is last as it's for long-range planning. The key interaction is filtering the weekly calendar, allowing the user to isolate specific training types (e.g., "Jiu-Jitsu") to easily see their frequency and placement.
+    Application Structure Plan: A single-page dashboard structure is used, split into five logical sections: "Typical Weekly Schedule", "Other Possible Training Sessions", "Lifestyle & Health Metrics", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen to flow from the specific (Schedule) to the foundational (Lifestyle) and then to the analytical (Charts) and long-term (Constraints). The new Lifestyle section uses simple metric cards for clear data presentation.
     Visualization & Content Choices:
-    - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) -> Interaction: Filter buttons (All, JJ, B, S&C, Recovery, Social) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
-    - Report Info: Example activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance.
-    - Report Info: Example training vs. social time (numeric) -> Goal: Compare time spent on training vs. social life -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Shows work/life/training balance at a glance.
+    - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking with RAG likelihood -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) with RAG colors -> Interaction: Filter buttons (All, JJ, B, S&C, Rec) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
+    - Report Info: Other Possible Sessions (list) -> Goal: Inform coach of potential extra sessions -> Viz/Presentation: Styled HTML List (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearly separates core schedule from optional sessions.
+    - Report Info: Lifestyle Metrics (Sleep, Macros, Weight) -> Goal: Present core health context -> Viz/Presentation: Four static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
+    - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance.
+    - Report Info: RAG Status by time (numeric) -> Goal: Visualize commitment certainty -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Allows coach to prioritize highly likely sessions vs. those requiring flexible planning.
     - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
     - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
     -->
@@ -40,6 +42,7 @@
         .activity-card {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             border: 1px solid #e0ddd9;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .activity-card.dimmed {
             opacity: 0.2;
@@ -53,20 +56,17 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
+        /* Filter button active colors */
         .filter-btn[data-filter="jj"].active { border-color: #3b82f6; background-color: #dbeafe; color: #1e3a8a; }
         .filter-btn[data-filter="b"].active { border-color: #14b8a6; background-color: #ccfbf1; color: #0f766e; }
         .filter-btn[data-filter="s&c"].active { border-color: #ef4444; background-color: #fee2e2; color: #991b1b; }
-        .filter-btn[data-filter="rec"].active { border-color: #22c55e; background-color: #dcfce7; color: #15803d; }
-        .filter-btn[data-filter="sl"].active { border-color: #a855f7; background-color: #f3e8ff; color: #6b21a8; }
-        .filter-btn[data-filter="all"].active { border-color: #6b7280; background-color: #f3f4f6; color: #374151; }
-
-        .card-jj { background-color: #eff6ff; border-left: 4px solid #3b82f6; }
-        .card-b { background-color: #f0fdfa; border-left: 4px solid #14b8a6; }
-        .card-s\&c { background-color: #fef2f2; border-left: 4px solid #ef4444; }
-        .card-ar { background-color: #f0fdf4; border-left: 4px solid #22c55e; }
-        .card-pr { background-color: #f0fdf4; border-left: 4px solid #22c55e; }
-        .card-sl { background-color: #faf5ff; border-left: 4px solid #a855f7; }
+        .filter-btn[data-filter="rec"].active { border-color: #a855f7; background-color: #f3e8ff; color: #7e22ce; }
         
+        /* RAG Status Styles */
+        .card-rag-green { background-color: #f0fdf4; border-left: 4px solid #10b981; }
+        .card-rag-amber { background-color: #fffbeb; border-left: 4px solid #f59e0b; }
+        .card-rag-red { background-color: #fef2f2; border-left: 4px solid #ef4444; }
+
         .day-header {
             background-color: #f4f3f1;
             border-bottom: 2px solid #e0ddd9;
@@ -88,17 +88,19 @@
         <section id="typical-week" class="mb-12">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Typical Weekly Schedule</h2>
             <p class="mb-6 text-gray-700">
-                This calendar shows the example schedule from the template. Use the filters to highlight specific activity types and see how they're distributed throughout the week. This helps visualize training frequency, recovery blocks, and potential conflicts with social events.
+                This calendar shows the scheduled training sessions. Use the filters to highlight specific activity types.
+                **Color Status Key (Likelihood of Attendance):** <span class="font-bold text-green-700">GREEN (High Likelihood)</span>, 
+                <span class="font-bold text-yellow-700">AMBER (Medium Likelihood/Flexible)</span>, 
+                <span class="font-bold text-red-700">RED (Low Likelihood/High Conflict)</span>.
             </p>
 
             <!-- Filter Buttons -->
             <div class="flex flex-wrap gap-2 mb-6">
                 <button class="filter-btn active font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="all">All</button>
-                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="jj">Jiu-Jitsu</button>
+                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="jj">Jiu-Jitsu/Wrestling</button>
                 <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="b">Boxing</button>
                 <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="s&c">S&C</button>
                 <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="rec">Recovery</button>
-                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="sl">Social/Life</button>
             </div>
 
             <!-- Weekly Grid -->
@@ -115,97 +117,159 @@
                 <!-- Activity Cards -->
                 <!-- Monday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
-                    <div class="activity-card card-jj rounded-lg p-3" data-activity-type="jj" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-blue-800">Jiu-Jitsu</span>
-                        <p class="text-xs text-gray-700">7:00 AM (90 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">RPE 8: Positional sparring.</p>
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="s&c">
+                        <span class="text-sm font-semibold text-red-800">S&C (RED)</span>
+                        <p class="text-xs text-gray-700">12:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 5. Low likelihood of attendance.</p>
                     </div>
-                    <div class="activity-card card-s&c rounded-lg p-3" data-activity-type="s&c" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-red-800">S&C</span>
-                        <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">Full body lift.</p>
-                    </div>
-                    <div class="activity-card card-pr rounded-lg p-3" data-activity-type="pr" data-rec="true" data-sl="false">
-                        <span class="text-sm font-semibold text-green-800">Passive Recovery</span>
-                        <p class="text-xs text-gray-700">9:30 PM (8.0 hrs)</p>
-                        <p class="text-xs text-gray-600 mt-1">Target sleep.</p>
+                    <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="jj">
+                        <span class="text-sm font-semibold text-yellow-800">Jiu-Jitsu (AMBER)</span>
+                        <p class="text-xs text-gray-700">7:30 PM (90 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 6: Drills & Sparring.</p>
                     </div>
                 </div>
                 <!-- Tuesday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
-                    <div class="activity-card card-b rounded-lg p-3" data-activity-type="b" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-teal-800">Boxing</span>
-                        <p class="text-xs text-gray-700">6:00 PM (60 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">Partner drills.</p>
+                    <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="b">
+                        <span class="text-sm font-semibold text-green-800">Boxing Circuit (GREEN)</span>
+                        <p class="text-xs text-gray-700">12:15 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 7: Circuit + Padwork.</p>
+                    </div>
+                    <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="s&c">
+                        <span class="text-sm font-semibold text-green-800">S&C (GREEN)</span>
+                        <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 8.</p>
+                    </div>
+                    <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="rec">
+                        <span class="text-sm font-semibold text-yellow-800">Recovery (AMBER)</span>
+                        <p class="text-xs text-gray-700">2:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Mobility, Sauna, etc.</p>
                     </div>
                 </div>
                 <!-- Wednesday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
-                    <div class="activity-card card-jj rounded-lg p-3" data-activity-type="jj" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-blue-800">Jiu-Jitsu</span>
-                        <p class="text-xs text-gray-700">7:00 AM (90 min)</p>
+                    <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="b">
+                        <span class="text-sm font-semibold text-green-800">Boxing (GREEN)</span>
+                        <p class="text-xs text-gray-700">12:45 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 7: Padwork.</p>
                     </div>
-                    <div class="activity-card card-sl rounded-lg p-3" data-activity-type="sl" data-rec="false" data-sl="true">
-                        <span class="text-sm font-semibold text-purple-800">Social/Life</span>
-                        <p class="text-xs text-gray-700">7:00 PM (3 hrs)</p>
-                        <p class="text-xs text-gray-600 mt-1">Dinner (late).</p>
+                    <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="jj">
+                        <span class="text-sm font-semibold text-green-800">JJ/Wrestling (GREEN)</span>
+                        <p class="text-xs text-gray-700">7:30 PM (90 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 8: Drills & Sparring.</p>
                     </div>
                 </div>
                 <!-- Thursday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
-                    <div class="activity-card card-s&c rounded-lg p-3" data-activity-type="s&c" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-red-800">S&C</span>
-                        <p class="text-xs text-gray-700">1:00 PM (45 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">Conditioning circuit.</p>
+                    <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="s&c">
+                        <span class="text-sm font-semibold text-yellow-800">S&C (AMBER)</span>
+                        <p class="text-xs text-gray-700">12:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 6.</p>
+                    </div>
+                     <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="rec">
+                        <span class="text-sm font-semibold text-yellow-800">Recovery (AMBER)</span>
+                        <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Mobility, Sauna, etc.</p>
                     </div>
                 </div>
                 <!-- Friday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
-                     <div class="activity-card card-b rounded-lg p-3" data-activity-type="b" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-teal-800">Boxing</span>
-                        <p class="text-xs text-gray-700">6:00 PM (60 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">Heavy bag work.</p>
+                     <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="jj">
+                        <span class="text-sm font-semibold text-yellow-800">Jiu-Jitsu (AMBER)</span>
+                        <p class="text-xs text-gray-700">7:00 AM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 4: Light Rolls/Technical Work.</p>
                     </div>
                 </div>
                 <!-- Saturday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
-                    <div class="activity-card card-jj rounded-lg p-3" data-activity-type="jj" data-rec="false" data-sl="false">
-                        <span class="text-sm font-semibold text-blue-800">Jiu-Jitsu</span>
-                        <p class="text-xs text-gray-700">10:00 AM (120 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">Open mat/hard rolling.</p>
-                    </div>
+                    <p class="text-xs text-gray-500 italic">Unscheduled</p>
                 </div>
                 <!-- Sunday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 border-gray-100 min-h-[200px]">
-                    <div class="activity-card card-ar rounded-lg p-3" data-activity-type="ar" data-rec="true" data-sl="false">
-                        <span class="text-sm font-semibold text-green-800">Active Recovery</span>
-                        <p class="text-xs text-gray-700">10:00 AM (45 min)</p>
-                        <p class="text-xs text-gray-600 mt-1">Mobility/walk.</p>
-                    </div>
-                    <div class="activity-card card-pr rounded-lg p-3" data-activity-type="pr" data-rec="true" data-sl="false">
-                        <span class="text-sm font-semibold text-green-800">Passive Recovery</span>
-                        <p class="text-xs text-gray-700">All Day</p>
-                        <p class="text-xs text-gray-600 mt-1">Meal prep/reset.</p>
-                    </div>
+                    <p class="text-xs text-gray-500 italic">Unscheduled</p>
                 </div>
             </div>
         </section>
 
-        <!-- Section 2: Weekly Analysis -->
+        <!-- Section 2: Other Possible Training Sessions -->
+        <section id="other-sessions" class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Other Possible Training Sessions</h2>
+            <p class="mb-6 text-gray-700">
+                These are additional sessions available during the week that are not part of the core schedule, but can be considered for inclusion.
+            </p>
+            <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                <ul class="list-disc list-inside space-y-3 text-gray-800">
+                    <li><span class="font-semibold">Jiu-Jitsu (Open Mat):</span> Saturday @ 10:00 AM</li>
+                    <li><span class="font-semibold">Jiu-Jitsu (Open Mat):</span> Sunday @ 10:00 AM</li>
+                    <li><span class="font-semibold">Jiu-Jitsu (Class):</span> Thursday @ 7:30 PM</li>
+                    <li><span class="font-semibold">Hyrox:</span> Friday @ 06:30 AM</li>
+                    <li><span class="font-semibold">Hyrox:</span> Sunday @ 08:30 AM</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Section 3: Lifestyle & Health Metrics -->
+        <section id="lifestyle" class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Lifestyle & Health Metrics</h2>
+            <p class="mb-6 text-gray-700">
+                These foundational metrics provide critical context for recovery, energy levels, and long-term goals.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Sleep Card -->
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-bold mb-2 text-blue-600 flex items-center">
+                        <span class="mr-2">&#9790;</span> Average Sleep
+                    </h3>
+                    <p class="text-4xl font-extrabold text-gray-900">7.2 hrs</p>
+                    <p class="text-sm text-gray-500 mt-1">Daily hours recorded.</p>
+                </div>
+                <!-- Macros Card -->
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-bold mb-2 text-green-600 flex items-center">
+                        <span class="mr-2">&#x25A0;</span> Current Macros
+                    </h3>
+                    <p class="text-md font-semibold text-gray-800">Protein: 200g</p>
+                    <p class="text-md font-semibold text-gray-800">Carbs: 250g</p>
+                    <p class="text-md font-semibold text-gray-800">Fats: 80g</p>
+                </div>
+                <!-- Weight History Card -->
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200 col-span-1 md:col-span-2 lg:col-span-1">
+                    <h3 class="text-lg font-bold mb-2 text-yellow-600 flex items-center">
+                        <span class="mr-2">&#9679;</span> Weight History
+                    </h3>
+                    <div class="space-y-1">
+                        <p class="text-md text-gray-700"><span class="font-bold">Lowest:</span> 82 kg</p>
+                        <p class="text-md text-gray-700"><span class="font-bold">Highest:</span> 106 kg</p>
+                        <p class="text-md text-gray-700"><span class="font-bold">Current:</span> 101 kg</p>
+                    </div>
+                </div>
+                 <!-- Target Card -->
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-bold mb-2 text-red-600 flex items-center">
+                        <span class="mr-2">&#9650;</span> Target Goal
+                    </h3>
+                    <p class="text-4xl font-extrabold text-gray-900">88 kg</p>
+                    <p class="text-sm text-gray-500 mt-1">Target date: March 26.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 4: Weekly Analysis -->
         <section id="weekly-analysis" class="mb-12">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Weekly Analysis</h2>
             <p class="mb-6 text-gray-700">
-                These charts visualize the time commitment based on the example schedule. This analysis helps identify the balance between different training modalities and the split between training and social/life events.
+                These charts reflect your 660-minute scheduled training week (including recovery). The second chart breaks down this time by your stated RAG likelihood, helping the coach understand your commitment priorities in the context of the lifestyle metrics above.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown</h3>
+                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown (Total: 660 min)</h3>
                     <div class="chart-container">
                         <canvas id="modalityChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training vs. Social Time</h3>
+                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Scheduled Time by RAG Likelihood</h3>
                     <div class="chart-container">
                         <canvas id="timeSplitChart"></canvas>
                     </div>
@@ -213,9 +277,9 @@
             </div>
         </section>
 
-        <!-- Section 3: Long-Term Constraints -->
+        <!-- Section 5: Long-Term Constraints -->
         <section id="long-term">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Long-Term Constraints (Weeks 2-12)</h2>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Long-Term Constraints (Weeks 1-12)</h2>
             <p class="mb-6 text-gray-700">
                 This table lists known future commitments that will impact the typical schedule. This is crucial for the coach to plan deload weeks, manage fatigue, and adjust training intensity around these events.
             </p>
@@ -284,16 +348,17 @@
                 return lines;
             }
 
+            /* --- UPDATED MODALITY DATA (Total: 660 min) --- */
             const modalityData = {
-                labels: ['Jiu-Jitsu (300 min)', 'Boxing (120 min)', 'S&C (105 min)', 'Active Recovery (45 min)'],
+                labels: ['Jiu-Jitsu (240 min)', 'Boxing (120 min)', 'S&C (180 min)', 'Recovery (120 min)'],
                 datasets: [{
                     label: 'Time in Minutes',
-                    data: [300, 120, 105, 45],
+                    data: [240, 120, 180, 120],
                     backgroundColor: [
-                        '#3b82f6', 
-                        '#14b8a6', 
-                        '#ef4444', 
-                        '#22c55e'  
+                        '#3b82f6', // JJ
+                        '#14b8a6', // Boxing
+                        '#ef4444', // S&C
+                        '#a855f7'  // Recovery
                     ],
                     borderColor: '#fdfcf9',
                     borderWidth: 4,
@@ -301,14 +366,16 @@
                 }]
             };
 
+            /* --- UPDATED RAG LIKELIHOOD DATA (Total: 660 min) --- */
             const timeSplitData = {
-                labels: ['Total Training (570 min)', 'Social Commitments (180 min)'],
+                labels: ['GREEN (270 min)', 'AMBER (330 min)', 'RED (60 min)'],
                 datasets: [{
-                    label: 'Time in Minutes',
-                    data: [570, 180],
+                    label: 'Time in Minutes by Likelihood',
+                    data: [270, 330, 60],
                     backgroundColor: [
-                        '#0ea5e9',
-                        '#a855f7'
+                        '#10b981', // Green
+                        '#f59e0b', // Amber
+                        '#ef4444'  // Red
                     ],
                     borderColor: '#fdfcf9',
                     borderWidth: 4,
@@ -387,16 +454,10 @@
 
                     activityCards.forEach(card => {
                         const type = card.dataset.activityType;
-                        const isRec = card.dataset.rec === 'true';
-                        const isSl = card.dataset.sl === 'true';
-
+                        
                         let show = false;
                         if (filter === 'all') {
                             show = true;
-                        } else if (filter === 'rec') {
-                            show = isRec;
-                        } else if (filter === 'sl') {
-                            show = isSl;
                         } else {
                             show = type === filter;
                         }
