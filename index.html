@@ -9,13 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- 
     Chosen Palette: Calm Focus (Warm Neutrals)
-    Application Structure Plan: A single-page dashboard structure is used, split into five logical sections: "Typical Weekly Schedule", "Other Possible Training Sessions", "Lifestyle & Health Metrics", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen to flow from the specific (Schedule) to the foundational (Lifestyle) and then to the analytical (Charts) and long-term (Constraints). The new Lifestyle section uses simple metric cards for clear data presentation.
+    Application Structure Plan: A single-page dashboard structure is used, split into five logical sections: "Typical Weekly Schedule", "Other Possible Training Sessions", "Lifestyle & Health Metrics", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen to flow from the specific (Schedule) to the foundational (Lifestyle) and then to the analytical (Charts) and long-term (Constraints). The new Lifestyle section uses simple metric cards for clear data presentation. The "Analysis" section now contains a single chart focused on time allocation by modality.
     Visualization & Content Choices:
     - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking with RAG likelihood -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) with RAG colors -> Interaction: Filter buttons (All, JJ, B, S&C, Rec) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
     - Report Info: Other Possible Sessions (list) -> Goal: Inform coach of potential extra sessions -> Viz/Presentation: Styled HTML List (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearly separates core schedule from optional sessions.
-    - Report Info: Lifestyle Metrics (Sleep, Macros, Weight) -> Goal: Present core health context -> Viz/Presentation: Four static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
-    - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance.
-    - Report Info: RAG Status by time (numeric) -> Goal: Visualize commitment certainty -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Allows coach to prioritize highly likely sessions vs. those requiring flexible planning.
+    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
+    - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Single Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance across modalities.
     - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
     - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
     -->
@@ -118,12 +117,12 @@
                 <!-- Monday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
                     <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="s&c">
-                        <span class="text-sm font-semibold text-red-800">S&C (RED)</span>
+                        <span class="text-sm font-semibold text-red-800">S&C</span>
                         <p class="text-xs text-gray-700">12:00 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 5. Low likelihood of attendance.</p>
                     </div>
                     <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="jj">
-                        <span class="text-sm font-semibold text-yellow-800">Jiu-Jitsu (AMBER)</span>
+                        <span class="text-sm font-semibold text-yellow-800">Jiu-Jitsu</span>
                         <p class="text-xs text-gray-700">7:30 PM (90 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 6: Drills & Sparring.</p>
                     </div>
@@ -131,17 +130,17 @@
                 <!-- Tuesday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
                     <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="b">
-                        <span class="text-sm font-semibold text-green-800">Boxing Circuit (GREEN)</span>
+                        <span class="text-sm font-semibold text-green-800">Boxing Circuit</span>
                         <p class="text-xs text-gray-700">12:15 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 7: Circuit + Padwork.</p>
                     </div>
                     <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="s&c">
-                        <span class="text-sm font-semibold text-green-800">S&C (GREEN)</span>
+                        <span class="text-sm font-semibold text-green-800">S&C</span>
                         <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 8.</p>
                     </div>
                     <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="rec">
-                        <span class="text-sm font-semibold text-yellow-800">Recovery (AMBER)</span>
+                        <span class="text-sm font-semibold text-yellow-800">Recovery</span>
                         <p class="text-xs text-gray-700">2:00 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">Mobility, Sauna, etc.</p>
                     </div>
@@ -149,12 +148,12 @@
                 <!-- Wednesday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
                     <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="b">
-                        <span class="text-sm font-semibold text-green-800">Boxing (GREEN)</span>
+                        <span class="text-sm font-semibold text-green-800">Boxing</span>
                         <p class="text-xs text-gray-700">12:45 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 7: Padwork.</p>
                     </div>
                     <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="jj">
-                        <span class="text-sm font-semibold text-green-800">JJ/Wrestling (GREEN)</span>
+                        <span class="text-sm font-semibold text-green-800">JJ/Wrestling</span>
                         <p class="text-xs text-gray-700">7:30 PM (90 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 8: Drills & Sparring.</p>
                     </div>
@@ -162,12 +161,12 @@
                 <!-- Thursday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
                     <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="s&c">
-                        <span class="text-sm font-semibold text-yellow-800">S&C (AMBER)</span>
+                        <span class="text-sm font-semibold text-yellow-800">S&C</span>
                         <p class="text-xs text-gray-700">12:00 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 6.</p>
                     </div>
                      <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="rec">
-                        <span class="text-sm font-semibold text-yellow-800">Recovery (AMBER)</span>
+                        <span class="text-sm font-semibold text-yellow-800">Recovery</span>
                         <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">Mobility, Sauna, etc.</p>
                     </div>
@@ -175,9 +174,14 @@
                 <!-- Friday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
                      <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="jj">
-                        <span class="text-sm font-semibold text-yellow-800">Jiu-Jitsu (AMBER)</span>
+                        <span class="text-sm font-semibold text-yellow-800">Jiu-Jitsu</span>
                         <p class="text-xs text-gray-700">7:00 AM (60 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 4: Light Rolls/Technical Work.</p>
+                    </div>
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="b">
+                        <span class="text-sm font-semibold text-red-800">Boxing Sparring</span>
+                        <p class="text-xs text-gray-700">6:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 9. High intensity/low likelihood.</p>
                     </div>
                 </div>
                 <!-- Saturday -->
@@ -220,20 +224,29 @@
                     <h3 class="text-lg font-bold mb-2 text-blue-600 flex items-center">
                         <span class="mr-2">&#9790;</span> Average Sleep
                     </h3>
-                    <p class="text-4xl font-extrabold text-gray-900">7.2 hrs</p>
+                    <p class="text-4xl font-extrabold text-gray-900">7h 15m</p>
                     <p class="text-sm text-gray-500 mt-1">Daily hours recorded.</p>
+                </div>
+                <!-- Steps Card -->
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-bold mb-2 text-indigo-600 flex items-center">
+                        <span class="mr-2">&#968;</span> Average Steps
+                    </h3>
+                    <p class="text-4xl font-extrabold text-gray-900">7,000</p>
+                    <p class="text-sm text-gray-500 mt-1">Daily steps recorded.</p>
                 </div>
                 <!-- Macros Card -->
                 <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
                     <h3 class="text-lg font-bold mb-2 text-green-600 flex items-center">
                         <span class="mr-2">&#x25A0;</span> Current Macros
                     </h3>
-                    <p class="text-md font-semibold text-gray-800">Protein: 200g</p>
-                    <p class="text-md font-semibold text-gray-800">Carbs: 250g</p>
-                    <p class="text-md font-semibold text-gray-800">Fats: 80g</p>
+                    <p class="text-md font-semibold text-gray-800">Calories: 2023</p>
+                    <p class="text-md font-semibold text-gray-800">Protein: 220g</p>
+                    <p class="text-md font-semibold text-gray-800">Carbs: 134g</p>
+                    <p class="text-md font-semibold text-gray-800">Fats: 67g</p>
                 </div>
                 <!-- Weight History Card -->
-                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200 col-span-1 md:col-span-2 lg:col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
                     <h3 class="text-lg font-bold mb-2 text-yellow-600 flex items-center">
                         <span class="mr-2">&#9679;</span> Weight History
                     </h3>
@@ -251,6 +264,14 @@
                     <p class="text-4xl font-extrabold text-gray-900">88 kg</p>
                     <p class="text-sm text-gray-500 mt-1">Target date: March 26.</p>
                 </div>
+                <!-- Golf/Other Lifestyle Factors Card -->
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-bold mb-2 text-purple-600 flex items-center">
+                        <span class="mr-2">&#9918;</span> Other Lifestyle Factors
+                    </h3>
+                    <p class="text-md text-gray-700"><span class="font-bold">Hobby:</span> Golf (Social, Low intensity)</p>
+                    <p class="text-sm text-gray-500 mt-1">Potential impact on weekend recovery/schedule.</p>
+                </div>
             </div>
         </section>
 
@@ -259,21 +280,16 @@
         <section id="weekly-analysis" class="mb-12">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Weekly Analysis</h2>
             <p class="mb-6 text-gray-700">
-                These charts reflect your 660-minute scheduled training week (including recovery). The second chart breaks down this time by your stated RAG likelihood, helping the coach understand your commitment priorities in the context of the lifestyle metrics above.
+                This chart reflects your **720-minute scheduled training week** (including recovery), providing a clear breakdown of your time commitment across different modalities.
             </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 gap-8 max-w-xl mx-auto">
                 <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown (Total: 660 min)</h3>
+                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown (Total: 720 min)</h3>
                     <div class="chart-container">
                         <canvas id="modalityChart"></canvas>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Scheduled Time by RAG Likelihood</h3>
-                    <div class="chart-container">
-                        <canvas id="timeSplitChart"></canvas>
-                    </div>
-                </div>
+                
             </div>
         </section>
 
@@ -348,34 +364,17 @@
                 return lines;
             }
 
-            /* --- UPDATED MODALITY DATA (Total: 660 min) --- */
+            /* --- UPDATED MODALITY DATA (Total: 720 min) --- */
             const modalityData = {
-                labels: ['Jiu-Jitsu (240 min)', 'Boxing (120 min)', 'S&C (180 min)', 'Recovery (120 min)'],
+                labels: ['Jiu-Jitsu (240 min)', 'Boxing (180 min)', 'S&C (180 min)', 'Recovery (120 min)'],
                 datasets: [{
                     label: 'Time in Minutes',
-                    data: [240, 120, 180, 120],
+                    data: [240, 180, 180, 120],
                     backgroundColor: [
                         '#3b82f6', // JJ
                         '#14b8a6', // Boxing
                         '#ef4444', // S&C
                         '#a855f7'  // Recovery
-                    ],
-                    borderColor: '#fdfcf9',
-                    borderWidth: 4,
-                    hoverOffset: 8
-                }]
-            };
-
-            /* --- UPDATED RAG LIKELIHOOD DATA (Total: 660 min) --- */
-            const timeSplitData = {
-                labels: ['GREEN (270 min)', 'AMBER (330 min)', 'RED (60 min)'],
-                datasets: [{
-                    label: 'Time in Minutes by Likelihood',
-                    data: [270, 330, 60],
-                    backgroundColor: [
-                        '#10b981', // Green
-                        '#f59e0b', // Amber
-                        '#ef4444'  // Red
                     ],
                     borderColor: '#fdfcf9',
                     borderWidth: 4,
@@ -432,13 +431,6 @@
             new Chart(modalityCtx, {
                 type: 'doughnut',
                 data: modalityData,
-                options: chartOptions
-            });
-
-            const timeSplitCtx = document.getElementById('timeSplitChart').getContext('2d');
-            new Chart(timeSplitCtx, {
-                type: 'doughnut',
-                data: timeSplitData,
                 options: chartOptions
             });
 
