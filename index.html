@@ -9,11 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- 
     Chosen Palette: Calm Focus (Warm Neutrals)
-    Application Structure Plan: A single-page dashboard structure is used, split into five logical sections: "Typical Weekly Schedule", "Other Possible Training Sessions", "Lifestyle & Health Metrics", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen to flow from the specific (Schedule) to the foundational (Lifestyle) and then to the analytical (Charts) and long-term (Constraints). The new Lifestyle section uses simple metric cards for clear data presentation. The "Analysis" section now contains a single chart focused on time allocation by modality.
+    Application Structure Plan: A single-page dashboard structure is used, split into five logical sections: "Typical Weekly Schedule", "Optional / Potential Sessions", "Lifestyle & Health Metrics", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen to flow from the specific (Schedule) to the foundational (Lifestyle) and then to the analytical (Charts) and long-term (Constraints). The Optional Sessions section now uses the same interactive grid format as the main schedule for better scannability. The "Analysis" section contains a single chart focused on time allocation by modality.
     Visualization & Content Choices:
     - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking with RAG likelihood -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) with RAG colors -> Interaction: Filter buttons (All, JJ, B, S&C, Rec) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
-    - Report Info: Other Possible Sessions (list) -> Goal: Inform coach of potential extra sessions -> Viz/Presentation: Styled HTML List (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearly separates core schedule from optional sessions.
-    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
+    - Report Info: Other Possible Sessions (grid) -> Goal: Inform coach of potential extra sessions visually -> Viz/Presentation: Secondary 7-Column Calendar Grid (HTML/Tailwind) with RED status -> Interaction: Inherits filter functionality from main schedule. -> Justification: Clearly separates core schedule from optional sessions while maintaining visual consistency.
+    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
     - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Single Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance across modalities.
     - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
     - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
@@ -87,7 +87,6 @@
         <section id="typical-week" class="mb-12">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Typical Weekly Schedule</h2>
             <p class="mb-6 text-gray-700">
-                This calendar shows the scheduled training sessions. Use the filters to highlight specific activity types.
                 **Color Status Key (Likelihood of Attendance):** <span class="font-bold text-green-700">GREEN (High Likelihood)</span>, 
                 <span class="font-bold text-yellow-700">AMBER (Medium Likelihood/Flexible)</span>, 
                 <span class="font-bold text-red-700">RED (Low Likelihood/High Conflict)</span>.
@@ -197,18 +196,63 @@
 
         <!-- Section 2: Other Possible Training Sessions -->
         <section id="other-sessions" class="mb-12">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Other Possible Training Sessions</h2>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Optional / Potential Sessions (RED Status)</h2>
             <p class="mb-6 text-gray-700">
-                These are additional sessions available during the week that are not part of the core schedule, but can be considered for inclusion.
+                These are supplementary sessions available during the week that are currently NOT included in the core schedule or analysis. Attendance is considered Low Likelihood (RED) unless otherwise planned.
             </p>
-            <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                <ul class="list-disc list-inside space-y-3 text-gray-800">
-                    <li><span class="font-semibold">Jiu-Jitsu (Open Mat):</span> Saturday @ 10:00 AM</li>
-                    <li><span class="font-semibold">Jiu-Jitsu (Open Mat):</span> Sunday @ 10:00 AM</li>
-                    <li><span class="font-semibold">Jiu-Jitsu (Class):</span> Thursday @ 7:30 PM</li>
-                    <li><span class="font-semibold">Hyrox:</span> Friday @ 06:30 AM</li>
-                    <li><span class="font-semibold">Hyrox:</span> Sunday @ 08:30 AM</li>
-                </ul>
+
+            <!-- Weekly Grid - Optional Sessions -->
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-1 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                <!-- Day Headers -->
+                <div class="day-header p-3 text-center font-bold text-gray-700">Monday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Tuesday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Wednesday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Thursday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Friday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Saturday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Sunday</div>
+
+                <!-- Activity Cards - All Red -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]"><p class="text-xs text-gray-500 italic">No Sessions</p></div>
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]"><p class="text-xs text-gray-500 italic">No Sessions</p></div>
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]"><p class="text-xs text-gray-500 italic">No Sessions</p></div>
+                <!-- Thursday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]">
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="jj">
+                        <span class="text-sm font-semibold text-red-800">Jiu-Jitsu Class</span>
+                        <p class="text-xs text-gray-700">7:30 PM (90 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE: N/A. Potential Add.</p>
+                    </div>
+                </div>
+                <!-- Friday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]">
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="s&c">
+                        <span class="text-sm font-semibold text-red-800">Hyrox Session</span>
+                        <p class="text-xs text-gray-700">6:30 AM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE: N/A. Potential Add.</p>
+                    </div>
+                </div>
+                <!-- Saturday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]">
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="jj">
+                        <span class="text-sm font-semibold text-red-800">JJ Open Mat</span>
+                        <p class="text-xs text-gray-700">10:00 AM (90 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE: N/A. Potential Add.</p>
+                    </div>
+                </div>
+                <!-- Sunday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 border-gray-100 min-h-[150px]">
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="s&c">
+                        <span class="text-sm font-semibold text-red-800">Hyrox Session</span>
+                        <p class="text-xs text-gray-700">8:30 AM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE: N/A. Potential Add.</p>
+                    </div>
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="jj">
+                        <span class="text-sm font-semibold text-red-800">JJ Open Mat</span>
+                        <p class="text-xs text-gray-700">10:00 AM (90 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE: N/A. Potential Add.</p>
+                    </div>
+                </div>
             </div>
         </section>
         
@@ -269,8 +313,11 @@
                     <h3 class="text-lg font-bold mb-2 text-purple-600 flex items-center">
                         <span class="mr-2">&#9918;</span> Other Lifestyle Factors
                     </h3>
-                    <p class="text-md text-gray-700"><span class="font-bold">Hobby:</span> Golf (Social, Low intensity)</p>
-                    <p class="text-sm text-gray-500 mt-1">Potential impact on weekend recovery/schedule.</p>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-700"><span class="font-bold">Hobby:</span> Golf (Social, Low intensity)</p>
+                        <p class="text-sm text-red-700"><span class="font-bold">Alcohol:</span> Frequent intake significantly impacts recovery/sleep.</p>
+                        <p class="text-sm text-yellow-800"><span class="font-bold">Renovations:</span> Consistent high-effort activity during weekends/evenings (impacts recovery and evening training).</p>
+                    </div>
                 </div>
             </div>
         </section>
