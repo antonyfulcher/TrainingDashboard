@@ -13,7 +13,7 @@
     Visualization & Content Choices:
     - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking with RAG likelihood -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) with RAG colors -> Interaction: Filter buttons (All, JJ, B, S&C, Rec) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
     - Report Info: Other Possible Sessions (grid) -> Goal: Inform coach of potential extra sessions visually -> Viz/Presentation: Secondary 7-Column Calendar Grid (HTML/Tailwind) with RED status -> Interaction: Inherits filter functionality from main schedule. -> Justification: Clearly separates core schedule from optional sessions while maintaining visual consistency.
-    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
+    - Report Info: Lifestyle Metrics (Sleep, Steps, Macros, Weight, Golf, Alcohol, Renovations, Partner Schedule) -> Goal: Present core health context -> Viz/Presentation: Six static metric cards (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Presents complex metrics clearly and compactly.
     - Report Info: Activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Single Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance across modalities.
     - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
     - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
@@ -87,9 +87,9 @@
         <section id="typical-week" class="mb-12">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Typical Weekly Schedule</h2>
             <p class="mb-6 text-gray-700">
-                **Color Status Key (Likelihood of Attendance):** <span class="font-bold text-green-700">GREEN (High Likelihood)</span>, 
-                <span class="font-bold text-yellow-700">AMBER (Medium Likelihood/Flexible)</span>, 
-                <span class="font-bold text-red-700">RED (Low Likelihood/High Conflict)</span>.
+                **Color Status Key (Likelihood of Attendance):** <span class="font-bold text-green-700">GREEN</span>, 
+                <span class="font-bold text-yellow-700">AMBER</span>, 
+                <span class="font-bold text-red-700">RED</span>.
             </p>
 
             <!-- Filter Buttons -->
@@ -130,7 +130,7 @@
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
                     <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="b">
                         <span class="text-sm font-semibold text-green-800">Boxing Circuit</span>
-                        <p class="text-xs text-gray-700">12:15 PM (60 min)</p>
+                        <p class="text-xs text-gray-700">12:15 PM (30 min)</p>
                         <p class="text-xs text-gray-600 mt-1">RPE 7: Circuit + Padwork.</p>
                     </div>
                     <div class="activity-card card-rag-green rounded-lg p-3" data-activity-type="s&c">
@@ -140,7 +140,7 @@
                     </div>
                     <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="rec">
                         <span class="text-sm font-semibold text-yellow-800">Recovery</span>
-                        <p class="text-xs text-gray-700">2:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-700">2:00 PM (30 min)</p>
                         <p class="text-xs text-gray-600 mt-1">Mobility, Sauna, etc.</p>
                     </div>
                 </div>
@@ -166,7 +166,7 @@
                     </div>
                      <div class="activity-card card-rag-amber rounded-lg p-3" data-activity-type="rec">
                         <span class="text-sm font-semibold text-yellow-800">Recovery</span>
-                        <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-700">1:00 PM (30 min)</p>
                         <p class="text-xs text-gray-600 mt-1">Mobility, Sauna, etc.</p>
                     </div>
                 </div>
@@ -196,9 +196,9 @@
 
         <!-- Section 2: Other Possible Training Sessions -->
         <section id="other-sessions" class="mb-12">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Optional / Potential Sessions (RED Status)</h2>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Optional / Potential Sessions</h2>
             <p class="mb-6 text-gray-700">
-                These are supplementary sessions available during the week that are currently NOT included in the core schedule or analysis. Attendance is considered Low Likelihood (RED) unless otherwise planned.
+                These are supplementary sessions available during the week that are currently NOT included in the core schedule or analysis. Attendance is considered **RED** unless otherwise planned.
             </p>
 
             <!-- Weekly Grid - Optional Sessions -->
@@ -218,6 +218,11 @@
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]"><p class="text-xs text-gray-500 italic">No Sessions</p></div>
                 <!-- Thursday -->
                 <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[150px]">
+                    <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="b">
+                        <span class="text-sm font-semibold text-red-800">Boxing (Pads)</span>
+                        <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE: N/A. Potential Add.</p>
+                    </div>
                     <div class="activity-card card-rag-red rounded-lg p-3" data-activity-type="jj">
                         <span class="text-sm font-semibold text-red-800">Jiu-Jitsu Class</span>
                         <p class="text-xs text-gray-700">7:30 PM (90 min)</p>
@@ -317,6 +322,7 @@
                         <p class="text-sm text-gray-700"><span class="font-bold">Hobby:</span> Golf (Social, Low intensity)</p>
                         <p class="text-sm text-red-700"><span class="font-bold">Alcohol:</span> Frequent intake significantly impacts recovery/sleep.</p>
                         <p class="text-sm text-yellow-800"><span class="font-bold">Renovations:</span> Consistent high-effort activity during weekends/evenings (impacts recovery and evening training).</p>
+                        <p class="text-sm text-blue-700"><span class="font-bold">Partner Schedule:</span> Variable days off require plan shuffling/flexibility for recovery and social time.</p>
                     </div>
                 </div>
             </div>
@@ -327,11 +333,11 @@
         <section id="weekly-analysis" class="mb-12">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Weekly Analysis</h2>
             <p class="mb-6 text-gray-700">
-                This chart reflects your **720-minute scheduled training week** (including recovery), providing a clear breakdown of your time commitment across different modalities.
+                This chart reflects your **630-minute scheduled training week** (including recovery), providing a clear breakdown of your time commitment across different modalities.
             </p>
             <div class="grid grid-cols-1 gap-8 max-w-xl mx-auto">
                 <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown (Total: 720 min)</h3>
+                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown (Total: 630 min)</h3>
                     <div class="chart-container">
                         <canvas id="modalityChart"></canvas>
                     </div>
@@ -359,22 +365,70 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">05/11/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Wedding - Evening Guest</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Unable to attend Jiujitsu PM / Impacted Recovery</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">06/11/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Anniversary</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Impacted Capacity for S&C</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">07/11/2025 - 09/11/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Anniversary Trip to London</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All Training Cancelled / Impacted Recovery</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">13/11/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Work - Office Day</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">No daytime Capacity</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">14/11/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Evening Music Gig</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">No Evening Capacity</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">15/11/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Birthday Event</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All Training Cancelled / Impacted Recovery</td>
+                            </tr>
+                            <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">4</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Date Range]</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Work Travel (SL)</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Only Active Recovery and Mobility will be possible.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">27/11/2025 - 02/12/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Holiday/Cruise</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Onboard Cruise - Ability to Use Gym</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">7</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Specific Date]</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Family Event (SL)</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">JJ and Boxing sessions cancelled; PR reduced.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">6</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">11/12/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Work Christmas Party</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All Training Cancelled / Impacted Recovery</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">10</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Date Range]</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Vacation (SL)</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All structured training cancelled; focus on rest.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">8</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">24/12/2025 - 26/12/2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Christmas Break</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All Training Cancelled / Impacted Recovery</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">9</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">31/12/2025 - 01/01/2026</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">NYE Break</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All Training Cancelled / Impacted Recovery</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">11</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Date]</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Placeholder for future event</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Adjust as needed.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -411,12 +465,12 @@
                 return lines;
             }
 
-            /* --- UPDATED MODALITY DATA (Total: 720 min) --- */
+            /* --- UPDATED MODALITY DATA (Total: 630 min) --- */
             const modalityData = {
-                labels: ['Jiu-Jitsu (240 min)', 'Boxing (180 min)', 'S&C (180 min)', 'Recovery (120 min)'],
+                labels: ['Jiu-Jitsu (240 min)', 'Boxing (150 min)', 'S&C (180 min)', 'Recovery (60 min)'],
                 datasets: [{
                     label: 'Time in Minutes',
-                    data: [240, 180, 180, 120],
+                    data: [240, 150, 180, 60],
                     backgroundColor: [
                         '#3b82f6', // JJ
                         '#14b8a6', // Boxing
