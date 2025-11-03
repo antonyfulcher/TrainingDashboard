@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Training Plan Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- 
+    Chosen Palette: Calm Focus (Warm Neutrals)
+    Application Structure Plan: A single-page dashboard structure is used, split into three logical sections: "Typical Weekly Schedule", "Weekly Analysis", and "Long-Term Constraints". This structure was chosen over a direct report mirror to immediately present the most actionable information (the weekly plan) in a visual, interactive format (a calendar grid). The "Analysis" section follows, providing synthesis of the plan (via charts), which is more user-friendly than forcing the user to do the math. The "Constraints" section is last as it's for long-range planning. The key interaction is filtering the weekly calendar, allowing the user to isolate specific training types (e.g., "Jiu-Jitsu") to easily see their frequency and placement.
+    Visualization & Content Choices:
+    - Report Info: Typical Weekly Schedule (table) -> Goal: Visualize weekly time/activity blocking -> Viz/Presentation: Interactive 7-Column Calendar Grid (HTML/Tailwind/JS) -> Interaction: Filter buttons (All, JJ, B, S&C, Recovery, Social) highlight relevant blocks. -> Justification: Far more intuitive and scannable than a text table.
+    - Report Info: Example activity durations (numeric) -> Goal: Compare time allocation between disciplines -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Instantly shows training balance.
+    - Report Info: Example training vs. social time (numeric) -> Goal: Compare time spent on training vs. social life -> Viz/Presentation: Donut Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. -> Justification: Shows work/life/training balance at a glance.
+    - Report Info: Long-Term Constraints (table) -> Goal: Inform of future disruptions -> Viz/Presentation: Styled HTML Table (HTML/Tailwind) -> Interaction: None (static info) -> Justification: Clearest way to present this specific data.
+    - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfcf9;
+            color: #3f3c3a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .activity-card {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            border: 1px solid #e0ddd9;
+        }
+        .activity-card.dimmed {
+            opacity: 0.2;
+            transform: scale(0.98);
+        }
+        .filter-btn {
+            transition: all 0.2s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .filter-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .filter-btn[data-filter="jj"].active { border-color: #3b82f6; background-color: #dbeafe; color: #1e3a8a; }
+        .filter-btn[data-filter="b"].active { border-color: #14b8a6; background-color: #ccfbf1; color: #0f766e; }
+        .filter-btn[data-filter="s&c"].active { border-color: #ef4444; background-color: #fee2e2; color: #991b1b; }
+        .filter-btn[data-filter="rec"].active { border-color: #22c55e; background-color: #dcfce7; color: #15803d; }
+        .filter-btn[data-filter="sl"].active { border-color: #a855f7; background-color: #f3e8ff; color: #6b21a8; }
+        .filter-btn[data-filter="all"].active { border-color: #6b7280; background-color: #f3f4f6; color: #374151; }
+
+        .card-jj { background-color: #eff6ff; border-left: 4px solid #3b82f6; }
+        .card-b { background-color: #f0fdfa; border-left: 4px solid #14b8a6; }
+        .card-s\&c { background-color: #fef2f2; border-left: 4px solid #ef4444; }
+        .card-ar { background-color: #f0fdf4; border-left: 4px solid #22c55e; }
+        .card-pr { background-color: #f0fdf4; border-left: 4px solid #22c55e; }
+        .card-sl { background-color: #faf5ff; border-left: 4px solid #a855f7; }
+        
+        .day-header {
+            background-color: #f4f3f1;
+            border-bottom: 2px solid #e0ddd9;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">My Training Plan Dashboard</h1>
+            <p class="mt-1 text-lg text-gray-600">An interactive overview of my typical week and long-term plan.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Section 1: Typical Weekly Schedule -->
+        <section id="typical-week" class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Typical Weekly Schedule</h2>
+            <p class="mb-6 text-gray-700">
+                This calendar shows the example schedule from the template. Use the filters to highlight specific activity types and see how they're distributed throughout the week. This helps visualize training frequency, recovery blocks, and potential conflicts with social events.
+            </p>
+
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button class="filter-btn active font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="all">All</button>
+                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="jj">Jiu-Jitsu</button>
+                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="b">Boxing</button>
+                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="s&c">S&C</button>
+                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="rec">Recovery</button>
+                <button class="filter-btn font-semibold py-2 px-4 rounded-full shadow-sm" data-filter="sl">Social/Life</button>
+            </div>
+
+            <!-- Weekly Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-1 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                <!-- Day Headers -->
+                <div class="day-header p-3 text-center font-bold text-gray-700">Monday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Tuesday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Wednesday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Thursday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Friday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Saturday</div>
+                <div class="day-header p-3 text-center font-bold text-gray-700">Sunday</div>
+
+                <!-- Activity Cards -->
+                <!-- Monday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
+                    <div class="activity-card card-jj rounded-lg p-3" data-activity-type="jj" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-blue-800">Jiu-Jitsu</span>
+                        <p class="text-xs text-gray-700">7:00 AM (90 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">RPE 8: Positional sparring.</p>
+                    </div>
+                    <div class="activity-card card-s&c rounded-lg p-3" data-activity-type="s&c" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-red-800">S&C</span>
+                        <p class="text-xs text-gray-700">1:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Full body lift.</p>
+                    </div>
+                    <div class="activity-card card-pr rounded-lg p-3" data-activity-type="pr" data-rec="true" data-sl="false">
+                        <span class="text-sm font-semibold text-green-800">Passive Recovery</span>
+                        <p class="text-xs text-gray-700">9:30 PM (8.0 hrs)</p>
+                        <p class="text-xs text-gray-600 mt-1">Target sleep.</p>
+                    </div>
+                </div>
+                <!-- Tuesday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
+                    <div class="activity-card card-b rounded-lg p-3" data-activity-type="b" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-teal-800">Boxing</span>
+                        <p class="text-xs text-gray-700">6:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Partner drills.</p>
+                    </div>
+                </div>
+                <!-- Wednesday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
+                    <div class="activity-card card-jj rounded-lg p-3" data-activity-type="jj" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-blue-800">Jiu-Jitsu</span>
+                        <p class="text-xs text-gray-700">7:00 AM (90 min)</p>
+                    </div>
+                    <div class="activity-card card-sl rounded-lg p-3" data-activity-type="sl" data-rec="false" data-sl="true">
+                        <span class="text-sm font-semibold text-purple-800">Social/Life</span>
+                        <p class="text-xs text-gray-700">7:00 PM (3 hrs)</p>
+                        <p class="text-xs text-gray-600 mt-1">Dinner (late).</p>
+                    </div>
+                </div>
+                <!-- Thursday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
+                    <div class="activity-card card-s&c rounded-lg p-3" data-activity-type="s&c" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-red-800">S&C</span>
+                        <p class="text-xs text-gray-700">1:00 PM (45 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Conditioning circuit.</p>
+                    </div>
+                </div>
+                <!-- Friday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
+                     <div class="activity-card card-b rounded-lg p-3" data-activity-type="b" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-teal-800">Boxing</span>
+                        <p class="text-xs text-gray-700">6:00 PM (60 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Heavy bag work.</p>
+                    </div>
+                </div>
+                <!-- Saturday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 md:border-r border-gray-100 min-h-[200px]">
+                    <div class="activity-card card-jj rounded-lg p-3" data-activity-type="jj" data-rec="false" data-sl="false">
+                        <span class="text-sm font-semibold text-blue-800">Jiu-Jitsu</span>
+                        <p class="text-xs text-gray-700">10:00 AM (120 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Open mat/hard rolling.</p>
+                    </div>
+                </div>
+                <!-- Sunday -->
+                <div class="p-2 space-y-2 border-t md:border-t-0 border-gray-100 min-h-[200px]">
+                    <div class="activity-card card-ar rounded-lg p-3" data-activity-type="ar" data-rec="true" data-sl="false">
+                        <span class="text-sm font-semibold text-green-800">Active Recovery</span>
+                        <p class="text-xs text-gray-700">10:00 AM (45 min)</p>
+                        <p class="text-xs text-gray-600 mt-1">Mobility/walk.</p>
+                    </div>
+                    <div class="activity-card card-pr rounded-lg p-3" data-activity-type="pr" data-rec="true" data-sl="false">
+                        <span class="text-sm font-semibold text-green-800">Passive Recovery</span>
+                        <p class="text-xs text-gray-700">All Day</p>
+                        <p class="text-xs text-gray-600 mt-1">Meal prep/reset.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Weekly Analysis -->
+        <section id="weekly-analysis" class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Weekly Analysis</h2>
+            <p class="mb-6 text-gray-700">
+                These charts visualize the time commitment based on the example schedule. This analysis helps identify the balance between different training modalities and the split between training and social/life events.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training Modality Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="modalityChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-center mb-4 text-gray-900">Training vs. Social Time</h3>
+                    <div class="chart-container">
+                        <canvas id="timeSplitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Long-Term Constraints -->
+        <section id="long-term">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Long-Term Constraints (Weeks 2-12)</h2>
+            <p class="mb-6 text-gray-700">
+                This table lists known future commitments that will impact the typical schedule. This is crucial for the coach to plan deload weeks, manage fatigue, and adjust training intensity around these events.
+            </p>
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Week #</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date(s)</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Constraint Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Impact on Training</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">4</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Date Range]</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Work Travel (SL)</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Only Active Recovery and Mobility will be possible.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">7</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Specific Date]</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Family Event (SL)</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">JJ and Boxing sessions cancelled; PR reduced.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">10</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">[Date Range]</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Vacation (SL)</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">All structured training cancelled; focus on rest.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-12 border-t border-gray-200 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-500">
+            <p>&copy; 2025 Training Plan Dashboard. Generated for planning and analysis.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            function wrapText(ctx, text, maxWidth) {
+                const words = text.split(' ');
+                let lines = [];
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    const word = words[i];
+                    const width = ctx.measureText(currentLine + " " + word).width;
+                    if (width < maxWidth) {
+                        currentLine += " " + word;
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            }
+
+            const modalityData = {
+                labels: ['Jiu-Jitsu (300 min)', 'Boxing (120 min)', 'S&C (105 min)', 'Active Recovery (45 min)'],
+                datasets: [{
+                    label: 'Time in Minutes',
+                    data: [300, 120, 105, 45],
+                    backgroundColor: [
+                        '#3b82f6', 
+                        '#14b8a6', 
+                        '#ef4444', 
+                        '#22c55e'  
+                    ],
+                    borderColor: '#fdfcf9',
+                    borderWidth: 4,
+                    hoverOffset: 8
+                }]
+            };
+
+            const timeSplitData = {
+                labels: ['Total Training (570 min)', 'Social Commitments (180 min)'],
+                datasets: [{
+                    label: 'Time in Minutes',
+                    data: [570, 180],
+                    backgroundColor: [
+                        '#0ea5e9',
+                        '#a855f7'
+                    ],
+                    borderColor: '#fdfcf9',
+                    borderWidth: 4,
+                    hoverOffset: 8
+                }]
+            };
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#3f3c3a',
+                            font: {
+                                family: "'Inter', sans-serif"
+                            },
+                            padding: 20,
+                            boxWidth: 15
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#3f3c3a',
+                        titleFont: {
+                            family: "'Inter', sans-serif",
+                            weight: 'bold',
+                            size: 14
+                        },
+                        bodyFont: {
+                            family: "'Inter', sans-serif",
+                            size: 12
+                        },
+                        padding: 12,
+                        cornerRadius: 4,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + ' min';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                cutout: '65%'
+            };
+
+            const modalityCtx = document.getElementById('modalityChart').getContext('2d');
+            new Chart(modalityCtx, {
+                type: 'doughnut',
+                data: modalityData,
+                options: chartOptions
+            });
+
+            const timeSplitCtx = document.getElementById('timeSplitChart').getContext('2d');
+            new Chart(timeSplitCtx, {
+                type: 'doughnut',
+                data: timeSplitData,
+                options: chartOptions
+            });
+
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const activityCards = document.querySelectorAll('.activity-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const filter = button.dataset.filter;
+
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    activityCards.forEach(card => {
+                        const type = card.dataset.activityType;
+                        const isRec = card.dataset.rec === 'true';
+                        const isSl = card.dataset.sl === 'true';
+
+                        let show = false;
+                        if (filter === 'all') {
+                            show = true;
+                        } else if (filter === 'rec') {
+                            show = isRec;
+                        } else if (filter === 'sl') {
+                            show = isSl;
+                        } else {
+                            show = type === filter;
+                        }
+
+                        if (show) {
+                            card.classList.remove('dimmed');
+                        } else {
+                            card.classList.add('dimmed');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
